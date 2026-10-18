@@ -1,7 +1,6 @@
-
 class Solution {
 public:
-    int digitSum(int n) {
+    int digSum(int n) {
         int sum = 0;
 
         while (n > 0) {
@@ -15,37 +14,47 @@ public:
     int minSwaps(vector<int>& nums) {
         int n = nums.size();
 
-        vector<pair<pair<int, int>, int>> arr;
+        vector<int> afterSorted(nums);
+
+        auto lambda = [this](int num1, int num2) {
+            int num1S = digSum(num1);
+            int num2S = digSum(num2);
+
+            if (num1S != num2S) {
+                return num1S < num2S;
+            }
+
+            return num1 < num2;
+        };
+
+        sort(afterSorted.begin(), afterSorted.end(), lambda);
+
+        unordered_map<int, int> valToIdx;
 
         for (int i = 0; i < n; i++) {
-            arr.push_back({{digitSum(nums[i]), nums[i]}, i});
+            valToIdx[nums[i]] = i;
         }
 
-        sort(arr.begin(), arr.end());
-
-        vector<int> visited(n, 0);
-        int swaps = 0;
+        int count = 0;
 
         for (int i = 0; i < n; i++) {
-            if (visited[i] || arr[i].second == i) {
+            int exp = afterSorted[i];
+            int curr = nums[i];
+
+            if (exp == curr) {
                 continue;
             }
 
-            int cycleSize = 0;
-            int j = i;
+            int idx = valToIdx[exp];
 
-            while (!visited[j]) {
-                visited[j] = 1;
-                j = arr[j].second;
-                cycleSize++;
-            }
+            swap(nums[i], nums[idx]);
 
-            if (cycleSize > 1) {
-                swaps += cycleSize - 1;
-            }
+            valToIdx[curr] = idx;
+            valToIdx[exp] = i;
+
+            count++;
         }
 
-        return swaps;
+        return count;
     }
 };
-
