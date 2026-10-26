@@ -1,47 +1,47 @@
+
 class Solution {
 public:
-    int m, n;
+    int n, m;
 
-    void dfs(vector<vector<int>>& grid, int r, int c) {
-        // Base case: out of bounds or water
-        if (r < 0 || c < 0 || r >= m || c >= n ||
-            grid[r][c] == 1) {
-            return;
+    bool dfs(vector<vector<int>>& grid, int r, int c) {
+
+        // If we go outside the grid, the island is not closed
+        if (r < 0 || r >= n || c < 0 || c >= m) {
+            return false;
         }
 
-        // Mark this land cell as visited
+        // Water or already visited land
+        if (grid[r][c] == 1) {
+            return true;
+        }
+
+        // Mark land as visited
         grid[r][c] = 1;
 
         // Explore all four directions
-        dfs(grid, r - 1, c); // Up
-        dfs(grid, r + 1, c); // Down
-        dfs(grid, r, c - 1); // Left
-        dfs(grid, r, c + 1); // Right
+        bool left = dfs(grid, r, c - 1);
+        bool right = dfs(grid, r, c + 1);
+        bool up = dfs(grid, r - 1, c);
+        bool down = dfs(grid, r + 1, c);
+
+        return left && right && up && down;
     }
 
     int closedIsland(vector<vector<int>>& grid) {
-        m = grid.size();
-        n = grid[0].size();
 
-        // Remove all islands connected to the boundary
-        for (int i = 0; i < m; i++) {
-            dfs(grid, i, 0);
-            dfs(grid, i, n - 1);
-        }
-
-        for (int j = 0; j < n; j++) {
-            dfs(grid, 0, j);
-            dfs(grid, m - 1, j);
-        }
+        n = grid.size();
+        m = grid[0].size();
 
         int count = 0;
 
-        // Count the remaining islands
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
                 if (grid[i][j] == 0) {
-                    count++;
-                    dfs(grid, i, j);
+
+                    if (dfs(grid, i, j)) {
+                        count++;
+                    }
                 }
             }
         }
@@ -49,3 +49,4 @@ public:
         return count;
     }
 };
+
